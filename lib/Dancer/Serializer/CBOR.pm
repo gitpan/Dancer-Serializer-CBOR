@@ -1,11 +1,37 @@
-package Dancer::Serializer::CBOR;
-
 use strict;
 use warnings;
+package Dancer::Serializer::CBOR;
+# ABSTRACT: serializer for handling CBOR data
+
 use Carp;
-use Dancer::ModuleLoader;
 use Dancer::Exception qw(:all);
+use CBOR::XS;
 use base 'Dancer::Serializer::Abstract';
+
+our $VERSION = '0.101'; # VERSION
+
+
+
+sub serialize {
+    my ($self, $entity) = @_;
+    CBOR::XS::encode_cbor($entity);
+}
+
+
+sub deserialize {
+    my ($self, $content) = @_;
+    CBOR::XS::decode_cbor($content);
+}
+
+
+sub content_type {'application/cbor'}
+
+
+1;
+
+__END__
+
+=pod
 
 =head1 NAME
 
@@ -13,11 +39,11 @@ Dancer::Serializer::CBOR - serializer for handling CBOR data
 
 =head1 VERSION
 
-Version 0.100
+version 0.101
 
-=cut
+=head1 DESCRIPTION
 
-our $VERSION = '0.100';
+This serializer allows to serialize and deserialize automatically the CBOR (Concise Binary Object Representation) structure.
 
 =head1 SYNOPSIS
 
@@ -30,53 +56,19 @@ our $VERSION = '0.100';
         return { user => get_id($id) };
     };
 
-=head1 DESCRIPTION
-
-This serializer allows to serialize and deserialize automatically the CBOR (Concise Binary Object Representation) structure.
-
 =head1 METHODS
-
-=cut
-
-# helpers
-
-sub loaded { Dancer::ModuleLoader->load('CBOR::XS') }
-
-sub init {
-    my ($self) = @_;
-    raise core_serializer => 'CBOR::XS is needed and is not installed'
-      unless $self->loaded;
-}
 
 =head2 serialize
 
 Serialize a data structure to a concise binary object representation.
 
-=cut
-
-sub serialize {
-    my ($self, $entity) = @_;
-    CBOR::XS::encode_cbor($entity);
-}
-
 =head2 deserialize
 
 Deserialize a concise binary object representation to a data structure.
 
-=cut
-
-sub deserialize {
-    my ($self, $content) = @_;
-    CBOR::XS::decode_cbor($content);
-}
-
 =head2 content_type
 
 Return 'application/cbor'
-
-=cut
-
-sub content_type {'application/cbor'}
 
 =head1 SEE ALSO
 
@@ -86,36 +78,25 @@ sub content_type {'application/cbor'}
 
 =back
 
-=head1 AUTHOR
-
-David Zurborg, C<< <zurborg@cpan.org> >>
-
 =head1 BUGS
 
-Please report any bugs or feature requests at L<https://github.com/zurborg/libdancer-serializer-cbor-perl/issues/new>.
+Please report any bugs or feature requests on the bugtracker website
+https://github.com/zurborg/libdancer-serializer-cbor-perl/issues
 
-=head1 SUPPORT
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
-You can find documentation for this module with the perldoc command.
+=head1 AUTHOR
 
-    perldoc Dancer::Serializer::CBOR
+David Zurborg <zurborg@cpan.org>
 
-You can also look for information at:
+=head1 COPYRIGHT AND LICENSE
 
-=over 4
+This software is Copyright (c) 2014 by David Zurborg.
 
-=item * GitHub: Public repository of the module
+This is free software, licensed under:
 
-L<https://github.com/zurborg/libdancer-serializer-cbor-perl>
-
-=back
-
-=head1 COPYRIGHT & LICENSE
-
-Copyright 2014 David Zurborg, all rights reserved.
-
-This program is released under the ISC license.
+  The ISC License
 
 =cut
-
-1;
